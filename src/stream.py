@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+"""
+File: stream.py
+Author: jxandercrawford@gmail.com
+Date: 2023-10-18
+Purpose: Stream & Pipe classes for building generator based pipelines.
+"""
 
 from typing import Iterator, Any
 import copy
@@ -15,10 +21,16 @@ class Hollow:
 
 
 class Pipe(Hollow):
+    """
+    An sequence of actions to be run on a given input.
+    """
 
     def __init__(self, *args):
         super().__init__()
         self.__actions = [lambda x: x, *args]
+
+    def __call__(self, *args):
+        return self.__execute(*args)
 
     def __execute(self, *args):
         value = self.__actions[0](*args)
@@ -31,11 +43,11 @@ class Pipe(Hollow):
         dup.__actions.append(action)
         return dup
 
-    def __call__(self, *args):
-        return self.__execute(*args)
-
 
 class Stream(Hollow):
+    """
+    An extendable iterator with a builtin Pipe to process items with.
+    """
 
     def __init__(self, source: Iterator):
         super().__init__()
