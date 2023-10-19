@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Iterator, List, Any
+from typing import Iterator, Any
 import copy
 from abc import abstractmethod
 
@@ -35,7 +35,7 @@ class Pipe(Hollow):
         return self.__execute(*args)
 
 
-class Proc(Hollow):
+class Stream(Hollow):
 
     def __init__(self, source: Iterator):
         super().__init__()
@@ -50,7 +50,7 @@ class Proc(Hollow):
         """
         Append an action to the process.
         :param action (Executable): An executable action to append to the pipe.
-        :returns: A Proc with new action.
+        :returns: A Stream with new action.
         """
         dup = copy.copy(self)
         dup.__pipe.through(action)
@@ -78,9 +78,9 @@ class Proc(Hollow):
         """
         Add an accumulator to the pipeline.
         :param n (int): Accumulate this many items before passing.
-        :returns: A Proc with a new accumulator.
+        :returns: A Stream with a new accumulator.
         """
-        return Proc(self.__chunker(n))
+        return Stream(self.__chunker(n))
 
     def take(self, n: int) -> list[Any]:
         """
@@ -111,9 +111,3 @@ class Proc(Hollow):
         :returns: None.
         """
         self.compile()
-
-
-if __name__ == "__main__":
-    from cli import Pull as cpull
-    proc = Proc(cpull().pull())
-    proc.through(lambda x: x.upper()).chunk(3).through(lambda x: "|".join(x)).through(print).drain()
