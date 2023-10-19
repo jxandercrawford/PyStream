@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from xio import Pull
-from typing import Iterator
+from typing import Iterator, List, Any
 import copy
 from abc import abstractmethod
 
@@ -43,21 +42,47 @@ class Proc(Hollow):
         self.__source = source
         self.__pipe = Pipe()
 
+    def __iter__(self):
+        for item in self.__source:
+            yield self.__pipe(item)
+
     def through(self, action):
         """
         Append an action to the process.
-        :param action (Executable): A executable action to append to the pipe.
+        :param action (Executable): An executable action to append to the pipe.
         :returns: A Proc with new action.
         """
         dup = copy.copy(self)
         dup.__pipe.through(action)
         return dup
 
-    def __iter__(self):
-        for item in self.__source:
-            yield self.__pipe(item)
+    def __chunker(self, n: int) -> Iterator:
+        """
+        Create an accumulator for source.
+        :param n (int): Accumulate this many items before returning.
+        :returns: An iterator of chunks.
+        """
+        acc = []
+        cnt = 0
 
-    def take(self, n: int) -> list:
+        for item in self:
+            acc.append(item)
+            cnt += 1
+            if cnt >= n:
+                yield acc
+                cnt = 0
+                acc = []
+        yield acc
+
+    def chunk(self, n: int):
+        """
+        Add an accumulator to the pipeline.
+        :param n (int): Accumulate this many items before passing.
+        :returns: A Proc with a new accumulator.
+        """
+        return Proc(self.__chunker(n))
+
+    def take(self, n: int) -> list[Any]:
         """
         Will compile the process for given amount of iterations. Will return less in event the stream is terminated.
         :param n (int): The number of iterations to compile.
@@ -90,6 +115,5 @@ class Proc(Hollow):
 
 if __name__ == "__main__":
     from cli import Pull as cpull
-
     proc = Proc(cpull().pull())
-    print(proc.through(lambda x: x.upper()).compile())
+    proc.through(lambda x: x.upper()).chunk(3).through(lambda x: "|".join(x)).through(print).drain()
