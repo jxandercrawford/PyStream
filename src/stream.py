@@ -68,6 +68,14 @@ class Stream(Hollow):
         dup.__pipe.through(action)
         return dup
 
+    def filter(self, condition):
+        """
+        Filter a stream.
+        :param condition: A function that will determine True to pass and False to discard.
+        :returns: A filtered Stream.
+        """
+        return Stream((x for x in self if condition(x)))
+
     def __chunker(self, n: int) -> Iterator:
         """
         Create an accumulator for source.
