@@ -6,7 +6,7 @@ Date: 2023-10-18
 Purpose: Stream & Pipe classes for building generator based pipelines.
 """
 
-from typing import Iterator, Any
+from typing import Iterator, Iterable, Any
 import copy
 from abc import abstractmethod
 
@@ -32,6 +32,9 @@ class Pipe(Hollow):
     def __call__(self, *args):
         return self.__execute(*args)
 
+    def __add__(self, other):
+        return self.through(other)
+
     def __execute(self, *args):
         value = self.__actions[0](*args)
         for action in self.__actions[1:]:
@@ -49,9 +52,9 @@ class Stream(Hollow):
     An extendable iterator with a builtin Pipe to process items with.
     """
 
-    def __init__(self, source: Iterator):
+    def __init__(self, source: Iterable):
         super().__init__()
-        self.__source = source
+        self.__source = iter(source)
         self.__pipe = Pipe()
 
     def __iter__(self):
