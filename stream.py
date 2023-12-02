@@ -46,10 +46,9 @@ class Stream:
         :param action (Executable): An executable action to append to the pipe.
         :return: A Stream with new action.
         """
-        dup = copy(self)
         if isinstance(action, Pipe):
-            return dup.flat_map(action)
-        return Stream((action(item) for item in dup))
+            return self.flat_map(action)
+        return Stream((action(item) for item in self))
 
     def through_map_on_chunk(self, action):
         """
@@ -57,10 +56,9 @@ class Stream:
         :param action (Executable): An executable action to append to the pipe.
         :return: A Stream with new action map purely on Chunks.
         """
-        dup = copy(self)
         if isinstance(action, Pipe):
-            return dup.flat_map(action)
-        return Stream(item.map(action) if isinstance(item, Chunk) else item for item in dup)
+            return self.flat_map(action)
+        return Stream(item.map(action) if isinstance(item, Chunk) else item for item in self)
 
     def filter(self, condition):
         """
@@ -68,8 +66,7 @@ class Stream:
         :param condition: A function that will determine True to pass and False to discard.
         :return: A filtered Stream.
         """
-        dup = copy(self)
-        return Stream((item for item in dup if condition(item)))
+        return Stream((item for item in self if condition(item)))
 
     def __chunker(self, n: int) -> Iterator:
         """
