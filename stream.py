@@ -118,7 +118,7 @@ class Stream:
         Compiles the stream to a list.
         :return: A list containing pipe output.
         """
-        return [i for i in self.__items]
+        return list(self.__items)
 
     def drain(self):
         """
