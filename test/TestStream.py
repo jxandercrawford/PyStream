@@ -95,6 +95,14 @@ class TestStream(unittest.TestCase):
         s = Stream(*TEST_VALUES)
         self.assertEqual(s.to_list(), list(TEST_VALUES))
 
+    def test_fork(self):
+        s = Stream(*TEST_VALUES)
+        s = s.fork(TEST_FILTER, TEST_FUNCTION)
+        for t1, t2 in zip(s, TEST_VALUES):
+            if TEST_FILTER(t2):
+                t2 = TEST_FUNCTION(t2)
+            self.assertEqual(t1, t2)
+
 
 if __name__ == '__main__':
     unittest.main()

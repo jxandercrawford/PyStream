@@ -17,6 +17,11 @@ s = Stream(0, 1, 2, 3, 4)
 # Iterate through a Stream
 for item in s:
     print(item)
+
+# 0
+# 1
+# . . .
+# 4
 ```
 
 The second way they can be initialized is via passing a single generator, interator, or any other iterable as the only argument in initialization. This enables lazy evaluation to be maintained when working with generators.
@@ -33,6 +38,12 @@ s2 = Stream((x for x in [0, 1, 2, 3, 4]))
 # Iterate through the Streams
 for i1, i2 in zip(s1, s2):
     print(i1, i2)
+
+# prints
+# 0 0
+# 1 1
+# . . .
+# 4 4
 ```
 
 ### Compiling Streams
@@ -52,6 +63,12 @@ print("Fetched via next():", i1)
 # Iterate through the Steam via for
 for item in s:
     print("Fetched via for(): ", item)
+
+# prints
+# Fetched via next(): 0
+# Fetched via for():  1
+# . . .
+# Fetched via for():  4
 ```
 
 Along with the builtin methods for iteration Stream has custom methods for compiling the Stream. These include the `to_list()`, `drain()`, and `take()` methods.
@@ -229,6 +246,44 @@ s = s.chunk(2).through_map_on_chunk(add_10)
 
 # Compile with to_list()
 print(s.to_list()) # prints [(10, 11), (12, 13), (14)]
+```
+
+### Forking
+
+Forking a stream acts like a combination of `filter()` and `through()`. It will execute a given action if a given condition is true. Otherwise it will pass the value unchanged. This enables branching of the Stream into more of a DAG than a single sequence of operations.
+
+```python
+from PyStream.stream import Stream, Pipe
+
+def add_10(n):
+    """
+    Example function that adds 10 to a number.
+    """
+    return n + 10
+
+def times_neg1(n):
+    """
+    Example function that multiplies by -1 to a number.
+    """
+    return n * -1
+
+def is_even(n):
+    """
+    Example function that returns if an even number.
+    """
+    return n % 2 == 0
+
+# Initialize a pipe
+p = Pipe().through(times_neg1)
+
+# Initialize a Stream with an iterable
+s = Stream([0, 1, 2, 3, 4])
+
+# Stream the values through a fork that multiplies evens by -1 then add 10 to all.
+s = s.fork(is_even, p).through(add_10)
+
+# Compile with to_list()
+print(s.to_list()) # prints [10, 11, 8, 13, 6]
 ```
 
 # Pipes

@@ -59,6 +59,15 @@ class TestStream(unittest.TestCase):
         self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[:N_TO_TAKE])))
         self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[N_TO_TAKE:N_TO_TAKE*2])))
 
+    def test_fork(self):
+        p = Pipe().fork(TEST_FILTER, TEST_FUNCTION)
+        s = Stream(*TEST_VALUES)
+        s = s.through(p)
+        for t1, t2 in zip(s, TEST_VALUES):
+            if TEST_FILTER(t2):
+                t2 = TEST_FUNCTION(t2)
+            self.assertEqual(t1, t2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -94,6 +94,30 @@ class Stream:
         """
         return Stream(self.__chunker(n))
 
+    def __forker(self, condition, action):
+        """
+        Will create a branch of the Stream to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        :param condition: A function that will determine True to pass to action and False to skip.
+        :param action (Executable): An executable action to append to the pipe if condition is True.
+        :returns: An iterator of the fork.
+        """
+        for item in self:
+            if condition(item) and isinstance(action, Pipe):
+                yield next(action(item))
+            elif condition(item):
+                yield action(item)
+            else:
+                yield item
+
+    def fork(self, condition, action):
+        """
+        Will create a branch of the Stream to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        :param condition: A function that will determine True to pass to action and False to skip.
+        :param action (Executable): An executable action to append to the pipe if condition is True.
+        :returns: A Stream with a new fork.
+        """
+        return Stream(self.__forker(condition, action))
+
     def take(self, n: int) -> list[Any]:
         """
         Will compile the process for given amount of iterations. Will return less in event the stream is terminated.
@@ -153,3 +177,37 @@ class Pipe:
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).chunk(n)
         return dup
+
+    def fork(self, condition, action):
+        dup = copy(self)
+        dup.__stream = lambda x: self.__stream(x).fork(condition, action)
+        return dup
+
+def add_10(n):
+    """
+    Example function that adds 10 to a number.
+    """
+    return n + 10
+
+def times_neg1(n):
+    """
+    Example function that multiplies by -1 to a number.
+    """
+    return n * -1
+
+def is_even(n):
+    """
+    Example function that returns if an even number.
+    """
+    return n % 2 == 0
+
+# Initialize a pipe
+p = Pipe().through(times_neg1)
+
+# Initialize a Stream with an iterable
+s = Stream([0, 1, 2, 3, 4])
+
+# Stream the values through a fork that multiplies evens by -1 then add 10 to all.
+s = s.fork(is_even, p).through(add_10)
+
+print(s.to_list())
