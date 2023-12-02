@@ -1,6 +1,6 @@
 # PyStream
 
-A simple implementation of streaming operations in Python using [generators](https://wiki.python.org/moin/Generators) inspired by [fs2](https://fs2.io/#/).
+A simple imperfect implementation of streaming operations in Python using [generators](https://wiki.python.org/moin/Generators) inspired by [fs2](https://fs2.io/#/).
 
 # Usage
 
