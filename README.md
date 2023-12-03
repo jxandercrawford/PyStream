@@ -43,51 +43,6 @@ print(s.to_list()) # ['1', 'Fizz', 'Buzz', 'FizzBuzz', '16']
 #### Solution with Multiple Functions and Streams
 The below snippet shows a solution using multiple functions, a Pipe, and a Stream. The solution is more complex than a single function, but offers customization.
 
-# PyStream
-
-A simple imperfect implementation of streaming operations in Python using [generators](https://wiki.python.org/moin/Generators) inspired by [fs2](https://fs2.io/#/).
-
-### Quick Start: FizzBuzz
-
-#### Problem
-Given an integer n, return a string array answer (1-indexed) where:
-
-- answer[i] == "FizzBuzz" if i is divisible by 3 and 5.
-- answer[i] == "Fizz" if i is divisible by 3.
-- answer[i] == "Buzz" if i is divisible by 5.
-- answer[i] == i (as a string) if none of the above conditions are true.
-
-#### Solution with a Single Function and Stream
-
-Streams are a stream of values in which operations can be commited. We can take the values and pass them through the solution as a function.
-
-```python
-from PyStream.stream import Stream
-
-def FizzBuzz(n):
-    """
-    Solution to FizzBuzz
-    """
-    if n % 3 == 0 and n % 5 == 0:
-        return "FizzBuzz"
-    elif n % 3 == 0:
-        return "Fizz"
-    elif n % 5 == 0:
-        return "Buzz"
-    return str(n)
-
-# Create Stream of values to test
-s = Stream(1, 3, 5, 15, 16)
-
-# Run Stream through function
-s = s.through(FizzBuzz)
-
-print(s.to_list()) # ['1', 'Fizz', 'Buzz', 'FizzBuzz', '16']
-```
-
-#### Solution with Multiple Functions and Streams
-The below snippet shows a solution using multiple functions, a Pipe, and a Stream. The solution is more complex than a single function, but offers customization.
-
 
 ```python
 from PyStream.stream import Stream, Pipe
