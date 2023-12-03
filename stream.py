@@ -54,7 +54,7 @@ class Stream:
         """
         Append an action to the process. If items in stream are Chunks then map action to them.
         :param action (Executable): An executable action to append to the pipe.
-        :return: A Stream with new action map purely on Chunks.
+        :return: A Stream with new action mapped to on Chunks.
         """
         if isinstance(action, Pipe):
             return self.flat_map(action)
@@ -159,55 +159,52 @@ class Pipe:
         return self.__stream(args)
 
     def through(self, action):
+        """
+        Append an action to the pipe.
+        :param action (Executable): An executable action to append to the pipe.
+        :return: A Pipe with new action.
+        """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).through(action)
         return dup
 
     def through_map_on_chunk(self, action):
+        """
+        Append an action to the process. If items in stream are Chunks then map action to them.
+        :param action (Executable): An executable action to append to the pipe.
+        :return: A Pipe with new action mapped to on Chunks.
+        """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).through_map_on_chunk(action)
         return dup
 
     def filter(self, action):
+        """
+        Filter a stream.
+        :param condition: A function that will determine True to pass and False to discard.
+        :return: A filtered Pipe.
+        """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).filter(action)
         return dup
 
     def chunk(self, n):
+        """
+        Add an accumulator to the pipeline.
+        :param n (int): Accumulate this many items before passing.
+        :return: A Pipe with a new accumulator.
+        """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).chunk(n)
         return dup
 
     def fork(self, condition, action):
+        """
+        Will create a branch of the Pipe to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        :param condition: A function that will determine True to pass to action and False to skip.
+        :param action (Executable): An executable action to append to the pipe if condition is True.
+        :returns: A Pipe with a new fork.
+        """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).fork(condition, action)
         return dup
-
-def add_10(n):
-    """
-    Example function that adds 10 to a number.
-    """
-    return n + 10
-
-def times_neg1(n):
-    """
-    Example function that multiplies by -1 to a number.
-    """
-    return n * -1
-
-def is_even(n):
-    """
-    Example function that returns if an even number.
-    """
-    return n % 2 == 0
-
-# Initialize a pipe
-p = Pipe().through(times_neg1)
-
-# Initialize a Stream with an iterable
-s = Stream([0, 1, 2, 3, 4])
-
-# Stream the values through a fork that multiplies evens by -1 then add 10 to all.
-s = s.fork(is_even, p).through(add_10)
-
-print(s.to_list())
