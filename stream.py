@@ -1,7 +1,6 @@
-from abc import ABC
 from copy import copy
 from itertools import chain
-from typing import Generator, Iterator, Iterable, Any, Tuple
+from typing import Generator, Iterator, Iterable, Tuple
 
 
 class Chunk(Tuple):
@@ -43,7 +42,7 @@ class Stream:
     def through(self, action):
         """
         Append an action to the process.
-        :param action (Executable): An executable action to append to the pipe.
+        :param action: An executable action to append to the pipe.
         :return: A Stream with new action.
         """
         if isinstance(action, Pipe):
@@ -53,7 +52,7 @@ class Stream:
     def through_map_on_chunk(self, action):
         """
         Append an action to the process. If items in stream are Chunks then map action to them.
-        :param action (Executable): An executable action to append to the pipe.
+        :param action: An executable action to append to the pipe.
         :return: A Stream with new action mapped to on Chunks.
         """
         if isinstance(action, Pipe):
@@ -68,10 +67,10 @@ class Stream:
         """
         return Stream((item for item in self if condition(item)))
 
-    def __chunker(self, n: int) -> Iterator:
+    def __chunker(self, n: int):
         """
         Create an accumulator for source.
-        :param n (int): Accumulate this many items before returning.
+        :param int n: Accumulate this many items before returning.
         :return: An iterator of chunks.
         """
         acc = []
@@ -89,19 +88,22 @@ class Stream:
     def chunk(self, n: int):
         """
         Add an accumulator to the pipeline.
-        :param n (int): Accumulate this many items before passing.
+        :param int n: Accumulate this many items before passing.
         :return: A Stream with a new accumulator.
         """
         return Stream(self.__chunker(n))
 
     def __forker(self, condition, action, *args):
         """
-        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination
+        of filter() and through() where will execute an action if condition is True, else nothing is done.
 
-        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the final argument as the else action.
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as
+        (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the
+        final argument as the else action.
         :param condition: A function that will determine True to pass to action and False to skip.
-        :param action (Executable): An executable action to append to the pipe if condition is True.
-        :returns: An iterator of the fork.
+        :param action: An executable action to append to the pipe if condition is True.
+        :returns: An iterator of a fork.
         """
         prongs = [condition, action, *args]
 
@@ -133,19 +135,22 @@ class Stream:
 
     def fork(self, condition, action, *args):
         """
-        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination
+        of filter() and through() where will execute an action if condition is True, else nothing is done.
 
-        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the final argument as the else action.
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as
+        (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the
+        final argument as the else action.
         :param condition: A function that will determine True to pass to action and False to skip.
-        :param action (Executable): An executable action to append to the pipe if condition is True.
+        :param action: An executable action to append to the pipe if condition is True.
         :returns: A Stream with a new fork.
         """
         return Stream(self.__forker(condition, action, *args))
 
-    def take(self, n: int) -> list[Any]:
+    def take(self, n: int) -> list:
         """
         Will compile the process for given amount of iterations. Will return less in event the stream is terminated.
-        :param n (int): The number of iterations to compile.
+        :param int n: The number of iterations to compile.
         :return: A list containing pipe output.
         """
         acc = []
@@ -185,7 +190,7 @@ class Pipe:
     def through(self, action):
         """
         Append an action to the pipe.
-        :param action (Executable): An executable action to append to the pipe.
+        :param action: An executable action to append to the pipe.
         :return: A Pipe with new action.
         """
         dup = copy(self)
@@ -195,27 +200,27 @@ class Pipe:
     def through_map_on_chunk(self, action):
         """
         Append an action to the process. If items in stream are Chunks then map action to them.
-        :param action (Executable): An executable action to append to the pipe.
+        :param action: An executable action to append to the pipe.
         :return: A Pipe with new action mapped to on Chunks.
         """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).through_map_on_chunk(action)
         return dup
 
-    def filter(self, action):
+    def filter(self, condition):
         """
         Filter a stream.
         :param condition: A function that will determine True to pass and False to discard.
         :return: A filtered Pipe.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).filter(action)
+        dup.__stream = lambda x: self.__stream(x).filter(condition)
         return dup
 
-    def chunk(self, n):
+    def chunk(self, n: int):
         """
         Add an accumulator to the pipeline.
-        :param n (int): Accumulate this many items before passing.
+        :param int n: Accumulate this many items before passing.
         :return: A Pipe with a new accumulator.
         """
         dup = copy(self)
@@ -224,12 +229,15 @@ class Pipe:
 
     def fork(self, condition, action, *args):
         """
-        Will create a branch of the Pipe to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination
+        of filter() and through() where will execute an action if condition is True, else nothing is done.
 
-        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN).
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as
+        (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the
+        final argument as the else action.
         :param condition: A function that will determine True to pass to action and False to skip.
-        :param action (Executable): An executable action to append to the pipe if condition is True.
-        :returns: A Pipe with a new fork.
+        :param action: An executable action to append to the pipe if condition is True.
+        :returns: A Stream with a new fork.
         """
         dup = copy(self)
         dup.__stream = lambda x: self.__stream(x).fork(condition, action, *args)
