@@ -68,6 +68,17 @@ class TestStream(unittest.TestCase):
                 t2 = TEST_FUNCTION(t2)
             self.assertEqual(t1, t2)
 
+    def test_fork_multiple(self):
+        p = Pipe().fork(TEST_FILTER, TEST_FUNCTION, lambda x: not TEST_FILTER(x), lambda x: TEST_FUNCTION(TEST_FUNCTION(x)))
+        s = Stream(*TEST_VALUES)
+        s = s.through(p)
+        for t1, t2 in zip(s, list(TEST_VALUES)):
+            if TEST_FILTER(t2):
+                t2 = TEST_FUNCTION(t2)
+            else:
+                t2 = TEST_FUNCTION(TEST_FUNCTION(t2))
+            self.assertEqual(t1, t2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -94,29 +94,53 @@ class Stream:
         """
         return Stream(self.__chunker(n))
 
-    def __forker(self, condition, action):
+    def __forker(self, condition, action, *args):
         """
-        Will create a branch of the Stream to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the final argument as the else action.
         :param condition: A function that will determine True to pass to action and False to skip.
         :param action (Executable): An executable action to append to the pipe if condition is True.
         :returns: An iterator of the fork.
         """
+        prongs = [condition, action, *args]
+
         for item in self:
-            if condition(item) and isinstance(action, Pipe):
-                yield next(action(item))
-            elif condition(item):
-                yield action(item)
-            else:
+            yielded = False
+
+            # Run loop to simulate if, elif, else
+            for i in range(0, len(prongs), 2):
+
+                # Catch if single last argument for else statement
+                if i == len(prongs)-1:
+                    condition = lambda x: True
+                    action = prongs[i]
+                else:
+                    condition = prongs[i]
+                    action = prongs[i+1]
+
+                if condition(item) and isinstance(action, Pipe):
+                    yield next(action(item))
+                    yielded = True
+                    break
+                elif condition(item):
+                    yield action(item)
+                    yielded = True
+                    break
+            # If condition never satisfied yield item unchanged
+            if not yielded:
                 yield item
 
-    def fork(self, condition, action):
+    def fork(self, condition, action, *args):
         """
-        Will create a branch of the Stream to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+        Will create a branch of the Stream to execute action on by emulating an if, elif, else sequence. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN). An odd number of arguments sets the final argument as the else action.
         :param condition: A function that will determine True to pass to action and False to skip.
         :param action (Executable): An executable action to append to the pipe if condition is True.
         :returns: A Stream with a new fork.
         """
-        return Stream(self.__forker(condition, action))
+        return Stream(self.__forker(condition, action, *args))
 
     def take(self, n: int) -> list[Any]:
         """
@@ -198,13 +222,15 @@ class Pipe:
         dup.__stream = lambda x: self.__stream(x).chunk(n)
         return dup
 
-    def fork(self, condition, action):
+    def fork(self, condition, action, *args):
         """
         Will create a branch of the Pipe to execute action on. A combination of filter() and through() where will execute an action if condition is True, else nothing is done.
+
+        This function can accept any number of conditions of actions after the first 2. It will always be parsed as (condition1, action1, condition2, action2, . . ., conditionN, actionN).
         :param condition: A function that will determine True to pass to action and False to skip.
         :param action (Executable): An executable action to append to the pipe if condition is True.
         :returns: A Pipe with a new fork.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).fork(condition, action)
+        dup.__stream = lambda x: self.__stream(x).fork(condition, action, *args)
         return dup
