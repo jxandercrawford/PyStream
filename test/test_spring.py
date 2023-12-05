@@ -1,10 +1,6 @@
 import unittest
-import sys
-
-# Add path to home dir
-sys.path.append("..")
-
 from stream import Spring
+
 TEST_VALUES = range(100)
 
 

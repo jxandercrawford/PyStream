@@ -1,9 +1,4 @@
 import unittest
-import sys
-
-# Add path to home dir
-sys.path.append("..")
-
 from stream import Stream
 from typing import Iterator
 
