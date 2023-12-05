@@ -1,8 +1,8 @@
 from abc import abstractmethod
-from modules.properties.operable import Operable
+from modules.properties.operablechunkable import OperableChunkable
 
 
-class CallableStream(Operable):
+class CallableStream(OperableChunkable):
     """
     An object that when called will produce a Stream.
     """

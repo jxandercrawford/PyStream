@@ -2,10 +2,11 @@ from itertools import chain
 from typing import Generator, Iterator, Iterable
 from modules.properties.callablestream import CallableStream
 from modules.properties.operablechunkable import OperableChunkable
+from modules.properties.compilable import Compilable
 from modules.chunk import Chunk
 
 
-class Stream(OperableChunkable):
+class Stream(OperableChunkable, Compilable):
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], (Generator, Iterator, Iterable)):

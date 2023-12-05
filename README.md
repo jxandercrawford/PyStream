@@ -434,3 +434,4 @@ The above example shows a use case in which the pipe can be used on single value
 - [ ] Steam is generator based meaning each child of a parent after a transformation retains the same source with a shared state. This is not an issue if known by the user, but can cause bugs if parents and children are both used.
 - [ ] Add more sources like cli.
 - [ ] Add tests for chunks.
+- [ ] Add documentation for springs.

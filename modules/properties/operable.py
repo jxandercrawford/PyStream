@@ -15,5 +15,5 @@ class Operable:
         pass
 
     @abstractmethod
-    def fork(self, condition, action):
+    def fork(self, condition, action, *args):
         pass
