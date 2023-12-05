@@ -8,7 +8,7 @@ TEST_FILTER = lambda x: x % 2 == 0
 N_TO_TAKE = 2
 
 
-class TestStream(unittest.TestCase):
+class TestPipe(unittest.TestCase):
     def test_init(self):
         p = Pipe()
         self.assertTrue(isinstance(p, Pipe))
