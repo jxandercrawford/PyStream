@@ -1,7 +1,11 @@
 import unittest
+import sys
+
+# Add path to home dir
+sys.path.append("..")
 
 from stream import Stream
-from typing import Iterator, Generator
+from typing import Iterator
 
 TEST_VALUES = list(range(100))
 TEST_FUNCTION = lambda x: x * 2
