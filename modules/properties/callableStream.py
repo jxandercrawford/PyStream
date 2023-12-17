@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from modules.properties.operablechunkable import OperableChunkable
+from modules.properties.operableChunkable import OperableChunkable
 
 
 class CallableStream(OperableChunkable):

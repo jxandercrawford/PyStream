@@ -1,4 +1,4 @@
-from modules.properties.callablestream import CallableStream
+from modules.properties.callableStream import CallableStream
 from modules.stream import Stream
 from copy import copy
 
