@@ -1,15 +1,18 @@
 from modules.properties.callableStream import CallableStream
 from modules.stream import Stream
+from modules.riverbed import Riverbed
 from copy import copy
 
 
 class Pipe(CallableStream):
 
     def __init__(self):
-        self.__stream = lambda x: Stream(*x)
+        self.__xs = lambda x: lambda y: y(*x)
 
-    def __call__(self, *args):
-        return self.__stream(args)
+    def __call__(self, *args, asynchronous: bool = False):
+        if asynchronous:
+            return self.__xs(args)(Riverbed)
+        return self.__xs(args)(Stream)
 
     def through(self, action):
         """
@@ -18,7 +21,7 @@ class Pipe(CallableStream):
         :return: A Pipe with new action.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).through(action)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).through(action)
         return dup
 
     def through_map_on_chunk(self, action):
@@ -28,7 +31,7 @@ class Pipe(CallableStream):
         :return: A Pipe with new action mapped to on Chunks.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).through_map_on_chunk(action)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).through_map_on_chunk(action)
         return dup
 
     def filter(self, condition):
@@ -38,7 +41,7 @@ class Pipe(CallableStream):
         :return: A filtered Pipe.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).filter(condition)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).filter(condition)
         return dup
 
     def chunk(self, n: int):
@@ -48,7 +51,7 @@ class Pipe(CallableStream):
         :return: A Pipe with a new accumulator.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).chunk(n)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).chunk(n)
         return dup
 
     def fork(self, condition, action, *args):
@@ -64,5 +67,15 @@ class Pipe(CallableStream):
         :returns: A Stream with a new fork.
         """
         dup = copy(self)
-        dup.__stream = lambda x: self.__stream(x).fork(condition, action, *args)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).fork(condition, action, *args)
+        return dup
+
+    def meter(self, n: float):
+        dup = copy(self)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).meter(n)
+        return dup
+
+    def dam(self, action):
+        dup = copy(self)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).dam(action)
         return dup

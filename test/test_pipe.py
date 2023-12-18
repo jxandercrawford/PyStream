@@ -1,5 +1,5 @@
 import unittest
-from stream import Stream, Pipe
+from stream import Stream, Riverbed, Pipe
 
 TEST_VALUES = range(100)
 TEST_FUNCTION = lambda x: x * 2
@@ -18,10 +18,16 @@ class TestPipe(unittest.TestCase):
         for t1, t2 in zip(s, TEST_VALUES):
             self.assertEqual(t1, t2)
 
-    def test_through(self):
+    def test_through_stream(self):
         p = Pipe().through(TEST_FUNCTION)
         s = Stream(*TEST_VALUES).through(p)
         for t1, t2 in zip(s, TEST_VALUES):
+            self.assertEqual(t1, TEST_FUNCTION(t2))
+
+    async def test_through_riverbed(self):
+        p = Pipe().through(TEST_FUNCTION)
+        r = Riverbed(*TEST_VALUES).through(p)
+        for t1, t2 in zip(await list(r), TEST_VALUES):
             self.assertEqual(t1, TEST_FUNCTION(t2))
 
     def test_through_2_times(self):

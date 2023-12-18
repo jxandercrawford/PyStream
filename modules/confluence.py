@@ -1,9 +1,9 @@
 import asyncio
 from modules.utilities.asyncTools import to_async_generator
-from typing import AsyncGenerator, AsyncIterator, AsyncIterable
+from typing import Iterable, AsyncIterator, AsyncIterable, Union
 
 
-class Confluence(AsyncIterator, AsyncIterable):
+class Confluence(AsyncIterator):
 
     def __init__(self):
         self.__queue = asyncio.Queue()
@@ -12,8 +12,8 @@ class Confluence(AsyncIterator, AsyncIterable):
         self.__gen_ready = asyncio.Event()
 
     async def __anext__(self):
-        if self.__gen is None:
-            raise RuntimeWarning("The Confluence must be started in order to be properly consumed.")
+        if not self.__gen_ready.is_set():
+            raise RuntimeWarning("The Confluence must be started via `start()` in order to be properly consumed.")
 
         try:
             return await self.__gen.__anext__()
@@ -23,8 +23,13 @@ class Confluence(AsyncIterator, AsyncIterable):
     def __aiter__(self):
         return self
 
-    async def __enqueue(self, items):
-        if not isinstance(items, (AsyncGenerator, AsyncIterator, AsyncIterable)):
+    async def __enqueue(self, items: Union[Iterable, AsyncIterable]):
+        """
+        Enqueue an item to the underlying asyncio Queue object.
+        :param items: The source to enqueue.
+        :return: None.
+        """
+        if not isinstance(items, AsyncIterable):
             items = to_async_generator(items)
 
         try:
@@ -36,6 +41,10 @@ class Confluence(AsyncIterator, AsyncIterable):
                 await self.__queue.put(None)
 
     async def __consume(self):
+        """
+        Consume the items in the queue by creating an AsyncGenerator.
+        :return: None.
+        """
         await self.__gen_ready.wait()
 
         try:
@@ -47,10 +56,19 @@ class Confluence(AsyncIterator, AsyncIterable):
         finally:
             pass
 
-    def feed(self, items):
+    def feed(self, items: Union[Iterable, AsyncIterable]):
+        """
+        Add a source to be fed into the queue for evaluation asynchronously.
+        :param items: The items to be fed to the queue.
+        :return: None.
+        """
         asyncio.create_task(self.__enqueue(items))
         self.__active_sources += 1
 
     def start(self):
+        """
+        Start the evaluation of the queue. Required to iterate over the items.
+        :return: None.
+        """
         self.__gen = self.__consume()
         self.__gen_ready.set()
