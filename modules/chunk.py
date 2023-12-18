@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Callable
 
 
 class Chunk(Tuple):
@@ -9,8 +9,13 @@ class Chunk(Tuple):
     def __init__(self, *args):
         super().__init__()
 
-    def flat_map(self, f):
-        return f(self)
+    def flat_map(self, action: Callable):
+        return action(self)
 
-    def map(self, f):
-        return Chunk(*map(f, self))
+    def map(self, action: Callable):
+        """
+        Map an action onto the underlying data.
+        :param action: A callable to evaluate on each item.
+        :return: A Chunk with the data evaluated by the action.
+        """
+        return Chunk(*map(action, self))

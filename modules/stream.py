@@ -1,7 +1,7 @@
 from itertools import chain
 from typing import Generator, Iterator, Iterable
-from modules.properties.callablestream import CallableStream
-from modules.properties.operablechunkable import OperableChunkable
+from modules.properties.callableStream import CallableStream
+from modules.properties.operableChunkable import OperableChunkable
 from modules.properties.compilable import Compilable
 from modules.chunk import Chunk
 
