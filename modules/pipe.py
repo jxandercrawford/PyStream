@@ -70,12 +70,23 @@ class Pipe(CallableStream):
         dup.__xs = lambda x: lambda y: self.__xs(x)(y).fork(condition, action, *args)
         return dup
 
-    def meter(self, n: float):
+    def dam(self, action):
+        """
+        Append an asynchronous action to the process. Will error if Steam is fed through the Pipe.
+        :param action: An asynchronous executable action to append to the pipe.
+        :return: A pipe with new action.
+        """
+        dup = copy(self)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).dam(action)
+        return dup
+
+    def meter(self, time: float):
+        """
+        Put sleep time into the pipeline before yielding to the next operation. Will error if Steam is fed through the Pipe.
+        :param time: The amount of time to sleep in seconds.
+        :return: A pipe with a delay.
+        """
         dup = copy(self)
         dup.__xs = lambda x: lambda y: self.__xs(x)(y).meter(n)
         return dup
 
-    def dam(self, action):
-        dup = copy(self)
-        dup.__xs = lambda x: lambda y: self.__xs(x)(y).dam(action)
-        return dup

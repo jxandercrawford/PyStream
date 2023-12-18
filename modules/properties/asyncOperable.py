@@ -4,6 +4,9 @@ from abc import abstractmethod
 
 
 class AsyncOperable(Operable):
+    """
+    An object that has asynchronous and synchronous operations that are chainable.
+    """
 
     @abstractmethod
     def dam(self, action: Callable):
