@@ -6,7 +6,7 @@ TEST_FUNCTION = lambda x: x * -1
 TEST_INDEX = 10
 
 
-class TestSpring(unittest.TestCase):
+class TestChunk(unittest.TestCase):
     def test_init(self):
         c = Chunk()
         self.assertTrue(isinstance(c, Chunk))
