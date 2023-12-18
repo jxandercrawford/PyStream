@@ -431,7 +431,6 @@ print(s.to_list()) # prints [(10, 11), (12, 13), (14)]
 The above example shows a use case in which the pipe can be used on single values or chunks to evaluate into the same values in stream or batch format. Pipes are simply reusable Stream operations.
 
 ## ToDo
-- [ ] Steam is generator based meaning each child of a parent after a transformation retains the same source with a shared state. This is not an issue if known by the user, but can cause bugs if parents and children are both used.
 - [ ] Add more sources like cli.
-- [ ] Add tests for chunks.
-- [ ] Add documentation for springs.
+- [ ] Add documentation for springs & riverbed/confluence.
+- [ ] Make a simple usecase tutorial.
