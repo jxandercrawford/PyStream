@@ -87,6 +87,6 @@ class Pipe(CallableStream):
         :return: A pipe with a delay.
         """
         dup = copy(self)
-        dup.__xs = lambda x: lambda y: self.__xs(x)(y).meter(n)
+        dup.__xs = lambda x: lambda y: self.__xs(x)(y).meter(time)
         return dup
 
