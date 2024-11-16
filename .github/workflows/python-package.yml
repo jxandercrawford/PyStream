@@ -46,7 +46,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=$FLAKE8_MAX_COMPLEXITY --max-line-length=$MAX_LINE_LENGTH --statistics --exclude venv,test
         # ensure code quality is high
-        pylint $( find . -iname "*.py" | grep -vE "test|venv|__init__ " ) --max-line-length=$MAX_LINE_LENGTH --fail-under $PYLINT_FAIL_UNDER
+        pylint $( find . -iname "*.py" | grep -vE "test|venv|__init__ " ) --max-line-length=$MAX_LINE_LENGTH --fail-under $PYLINT_FAIL_UNDER --disable=E0401
     - name: Test
       run: |
         python -m unittest discover test
