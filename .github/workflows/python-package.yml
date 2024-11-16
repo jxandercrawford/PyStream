@@ -28,13 +28,24 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8
+        python -m pip install isort
+        python -m pip install black
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
+    - name: Code Quality
+      env:
+        FLAKE8_MAX_COMPLEXITY: 10
+        PYLINT_FAIL_UNDER: 6
+        MAX_LINE_LENGTH: 127
       run: |
+        # run auto formatters
+        isort .
+        black .
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude venv,test
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with unittest
+        flake8 . --count --exit-zero --max-complexity=$FLAKE8_MAX_COMPLEXITY --max-line-length=$MAX_LINE_LENGTH --statistics --exclude venv,test
+        # ensure code quality is high
+        pylint $( find . -iname "*.py" | grep -vE "test|venv|__init__ " ) --max-line-length=$MAX_LINE_LENGTH --fail-under $PYLINT_FAIL_UNDER
+    - name: Test
       run: |
         python -m unittest discover test

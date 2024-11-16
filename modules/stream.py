@@ -1,12 +1,16 @@
 from itertools import chain
-from typing import Generator, Iterator, Iterable
-from modules.properties.callableStream import CallableStream
-from modules.properties.operableChunkable import OperableChunkable
-from modules.properties.compilable import Compilable
+from typing import Generator, Iterable, Iterator
+
 from modules.chunk import Chunk
+from modules.properties.callableStream import CallableStream
+from modules.properties.compilable import Compilable
+from modules.properties.operableChunkable import OperableChunkable
 
 
 class Stream(OperableChunkable, Compilable):
+    """
+    An immutable streaming datatype.
+    """
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], (Generator, Iterator, Iterable)):
@@ -45,7 +49,9 @@ class Stream(OperableChunkable, Compilable):
         """
         if isinstance(action, CallableStream):
             return self.flat_map(action)
-        return Stream(item.map(action) if isinstance(item, Chunk) else item for item in self)
+        return Stream(
+            item.map(action) if isinstance(item, Chunk) else item for item in self
+        )
 
     def filter(self, condition):
         """
@@ -102,12 +108,12 @@ class Stream(OperableChunkable, Compilable):
             for i in range(0, len(prongs), 2):
 
                 # Catch if single last argument for else statement
-                if i == len(prongs)-1:
+                if i == len(prongs) - 1:
                     condition = lambda x: True
                     action = prongs[i]
                 else:
                     condition = prongs[i]
-                    action = prongs[i+1]
+                    action = prongs[i + 1]
 
                 if condition(item) and isinstance(action, CallableStream):
                     yield next(action(item))

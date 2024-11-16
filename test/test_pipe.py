@@ -1,5 +1,6 @@
 import unittest
-from stream import Stream, Riverbed, Pipe
+
+from stream import Pipe, Riverbed, Stream
 
 TEST_VALUES = range(100)
 TEST_FUNCTION = lambda x: x * 2
@@ -56,13 +57,15 @@ class TestPipe(unittest.TestCase):
         p = Pipe().chunk(N_TO_TAKE)
         s = Stream(*TEST_VALUES).through(p)
         self.assertEqual(next(s), tuple(TEST_VALUES[:N_TO_TAKE]))
-        self.assertEqual(next(s), tuple(TEST_VALUES[N_TO_TAKE:N_TO_TAKE * 2]))
+        self.assertEqual(next(s), tuple(TEST_VALUES[N_TO_TAKE : N_TO_TAKE * 2]))
 
     def test_map_on_chunk(self):
         p = Pipe().chunk(N_TO_TAKE).through_map_on_chunk(TEST_FUNCTION)
         s = Stream(*TEST_VALUES).through(p)
         self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[:N_TO_TAKE])))
-        self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[N_TO_TAKE:N_TO_TAKE * 2])))
+        self.assertEqual(
+            next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[N_TO_TAKE : N_TO_TAKE * 2]))
+        )
 
     def test_fork(self):
         p = Pipe().fork(TEST_FILTER, TEST_FUNCTION)
@@ -74,8 +77,12 @@ class TestPipe(unittest.TestCase):
             self.assertEqual(t1, t2)
 
     def test_fork_multiple(self):
-        p = Pipe().fork(TEST_FILTER, TEST_FUNCTION, lambda x: not TEST_FILTER(x),
-                        lambda x: TEST_FUNCTION(TEST_FUNCTION(x)))
+        p = Pipe().fork(
+            TEST_FILTER,
+            TEST_FUNCTION,
+            lambda x: not TEST_FILTER(x),
+            lambda x: TEST_FUNCTION(TEST_FUNCTION(x)),
+        )
         s = Stream(*TEST_VALUES)
         s = s.through(p)
         for t1, t2 in zip(s, list(TEST_VALUES)):
@@ -86,5 +93,5 @@ class TestPipe(unittest.TestCase):
             self.assertEqual(t1, t2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,10 @@
-from typing import Tuple, Callable
+from typing import Callable, Tuple
 
 
 class Chunk(Tuple):
+    """
+    A batched set of items.
+    """
 
     def __new__(self, *args):
         return super(Chunk, self).__new__(self, args)

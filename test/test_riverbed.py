@@ -1,4 +1,5 @@
 import unittest
+
 from stream import Riverbed
 
 TEST_VALUES = list(range(100))
@@ -51,7 +52,7 @@ class TestRiverbed(unittest.TestCase):
         for t1, t2 in zip(values, TEST_VALUES[:N_TO_TAKE]):
             self.assertEqual(t1, t2)
         values = await r.take(N_TO_TAKE)
-        for t1, t2 in zip(values, TEST_VALUES[N_TO_TAKE:N_TO_TAKE * 2]):
+        for t1, t2 in zip(values, TEST_VALUES[N_TO_TAKE : N_TO_TAKE * 2]):
             self.assertEqual(t1, t2)
 
     async def test_fork(self):
@@ -64,7 +65,12 @@ class TestRiverbed(unittest.TestCase):
 
     async def test_fork_multiple(self):
         r = Riverbed(*TEST_VALUES)
-        r = r.fork(TEST_FILTER, TEST_FUNCTION, lambda x: not TEST_FILTER(x), lambda x: TEST_FUNCTION(TEST_FUNCTION(x)))
+        r = r.fork(
+            TEST_FILTER,
+            TEST_FUNCTION,
+            lambda x: not TEST_FILTER(x),
+            lambda x: TEST_FUNCTION(TEST_FUNCTION(x)),
+        )
         for t1, t2 in zip(await list(r), TEST_VALUES):
             if TEST_FILTER(t2):
                 t2 = TEST_FUNCTION(t2)
@@ -73,5 +79,5 @@ class TestRiverbed(unittest.TestCase):
             self.assertEqual(t1, t2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

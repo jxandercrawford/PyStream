@@ -1,4 +1,5 @@
 import unittest
+
 from stream import Spring
 
 TEST_VALUES = range(100)
@@ -27,5 +28,5 @@ class TestSpring(unittest.TestCase):
             self.assertEqual(next(s), t)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,15 +1,24 @@
-from typing import Callable, Generator, Iterator, Iterable, AsyncGenerator, AsyncIterator, AsyncIterable
-from modules.properties.callableStream import CallableStream
-from modules.utilities.asyncTools import to_async_generator, async_to_async_generator, amap, afilter, async_amap
+from typing import (AsyncGenerator, AsyncIterable, AsyncIterator, Callable,
+                    Generator, Iterable, Iterator)
+
 from modules.properties.asyncOperable import AsyncOperable
+from modules.properties.callableStream import CallableStream
+from modules.utilities.asyncTools import (afilter, amap, async_amap,
+                                          async_to_async_generator,
+                                          to_async_generator)
 
 
 class Riverbed(AsyncOperable):
+    """
+    An asynchronous Stream.
+    """
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], (Generator, Iterator, Iterable)):
             self.__items = to_async_generator(args[0])
-        elif len(args) == 1 and isinstance(args[0], (AsyncGenerator, AsyncIterator, AsyncIterable)):
+        elif len(args) == 1 and isinstance(
+            args[0], (AsyncGenerator, AsyncIterator, AsyncIterable)
+        ):
             self.__items = async_to_async_generator(args[0])
         else:
             self.__items = to_async_generator((i for i in args))

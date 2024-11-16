@@ -8,4 +8,7 @@ class Chunkable:
 
     @abstractmethod
     def chunk(self, n: int):
+        """
+        Chunk the data structure into chunks of n.
+        """
         pass

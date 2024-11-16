@@ -1,5 +1,6 @@
+from typing import Generator, Iterable, Iterator
+
 from modules.stream import Stream
-from typing import Generator, Iterator, Iterable
 
 
 def emit(xs: Iterable = None):
@@ -24,6 +25,9 @@ def emit(xs: Iterable = None):
 
 
 class Spring(Stream):
+    """
+    A repeating stream of the given arguments.
+    """
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], (Generator, Iterator, Iterable)):

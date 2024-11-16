@@ -1,6 +1,7 @@
 from abc import abstractmethod
-from modules.properties.operable import Operable
+
 from modules.properties.chunkable import Chunkable
+from modules.properties.operable import Operable
 
 
 class OperableChunkable(Operable, Chunkable):
@@ -10,4 +11,7 @@ class OperableChunkable(Operable, Chunkable):
 
     @abstractmethod
     def through_map_on_chunk(self, action):
+        """
+        Map a callable onto a chunk within the data structure.
+        """
         pass

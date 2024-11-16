@@ -1,10 +1,14 @@
-from modules.properties.callableStream import CallableStream
-from modules.stream import Stream
-from modules.riverbed import Riverbed
 from copy import copy
+
+from modules.properties.callableStream import CallableStream
+from modules.riverbed import Riverbed
+from modules.stream import Stream
 
 
 class Pipe(CallableStream):
+    """
+    A pipeline of actions to be applied to a Stream or Riverbed.
+    """
 
     def __init__(self):
         self.__xs = lambda x: lambda y: y(*x)
@@ -89,4 +93,3 @@ class Pipe(CallableStream):
         dup = copy(self)
         dup.__xs = lambda x: lambda y: self.__xs(x)(y).meter(time)
         return dup
-

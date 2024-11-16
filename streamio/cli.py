@@ -1,12 +1,13 @@
 import sys
-from stream import Stream, Pipe
+
+from stream import Pipe, Stream
 
 
 def yield_input():
     """
-   Open the stdin and read lines to as a generator. Dies at EOF.
-   :return: A generator taking in the stdin.
-   """
+    Open the stdin and read lines to as a generator. Dies at EOF.
+    :return: A generator taking in the stdin.
+    """
     while 1:
         try:
             content = input()

@@ -1,6 +1,7 @@
 import unittest
-from stream import Stream
 from typing import Iterator
+
+from stream import Stream
 
 TEST_VALUES = list(range(100))
 TEST_FUNCTION = lambda x: x * 2
@@ -69,7 +70,9 @@ class TestStream(unittest.TestCase):
         s = Stream(*TEST_VALUES)
         for t1, t2 in zip(s.take(N_TO_TAKE), TEST_VALUES[:N_TO_TAKE]):
             self.assertEqual(t1, t2)
-        for t1, t2 in zip(s.take(N_TO_TAKE), TEST_VALUES[N_TO_TAKE:N_TO_TAKE+N_TO_TAKE]):
+        for t1, t2 in zip(
+            s.take(N_TO_TAKE), TEST_VALUES[N_TO_TAKE : N_TO_TAKE + N_TO_TAKE]
+        ):
             self.assertEqual(t1, t2)
 
     def test_chunking_length(self):
@@ -83,12 +86,14 @@ class TestStream(unittest.TestCase):
     def test_chunking_values_twice(self):
         s = Stream(*TEST_VALUES).chunk(N_TO_TAKE)
         self.assertEqual(next(s), tuple(TEST_VALUES[:N_TO_TAKE]))
-        self.assertEqual(next(s), tuple(TEST_VALUES[N_TO_TAKE:N_TO_TAKE*2]))
+        self.assertEqual(next(s), tuple(TEST_VALUES[N_TO_TAKE : N_TO_TAKE * 2]))
 
     def test_map_on_chunk(self):
         s = Stream(*TEST_VALUES).chunk(N_TO_TAKE).through_map_on_chunk(TEST_FUNCTION)
         self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[:N_TO_TAKE])))
-        self.assertEqual(next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[N_TO_TAKE:N_TO_TAKE*2])))
+        self.assertEqual(
+            next(s), tuple(map(TEST_FUNCTION, TEST_VALUES[N_TO_TAKE : N_TO_TAKE * 2]))
+        )
 
     def test_to_list(self):
         s = Stream(*TEST_VALUES)
@@ -104,7 +109,12 @@ class TestStream(unittest.TestCase):
 
     def test_fork_multiple(self):
         s = Stream(*TEST_VALUES)
-        s = s.fork(TEST_FILTER, TEST_FUNCTION, lambda x: not TEST_FILTER(x), lambda x: TEST_FUNCTION(TEST_FUNCTION(x)))
+        s = s.fork(
+            TEST_FILTER,
+            TEST_FUNCTION,
+            lambda x: not TEST_FILTER(x),
+            lambda x: TEST_FUNCTION(TEST_FUNCTION(x)),
+        )
         for t1, t2 in zip(s, list(TEST_VALUES)):
             if TEST_FILTER(t2):
                 t2 = TEST_FUNCTION(t2)
@@ -113,5 +123,5 @@ class TestStream(unittest.TestCase):
             self.assertEqual(t1, t2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,4 @@
-from stream import Stream, Pipe
+from stream import Pipe, Stream
 
 
 def yield_lines(path: str):

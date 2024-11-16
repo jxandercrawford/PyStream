@@ -1,8 +1,10 @@
 import asyncio
-from typing import Callable, Generator, Iterable, AsyncGenerator, AsyncIterable
+from typing import AsyncGenerator, AsyncIterable, Callable, Generator, Iterable
 
 
-async def to_async_generator(items: Iterable, sleep_time: float = 0.0) -> AsyncGenerator:
+async def to_async_generator(
+    items: Iterable, sleep_time: float = 0.0
+) -> AsyncGenerator:
     """
     Convert any iterable into an async generator.
     :param items: An iterable to convert.
@@ -14,8 +16,9 @@ async def to_async_generator(items: Iterable, sleep_time: float = 0.0) -> AsyncG
         yield item
 
 
-async def async_to_async_generator(items: AsyncIterable,
-                                   sleep_time: float = 0.0) -> AsyncGenerator:
+async def async_to_async_generator(
+    items: AsyncIterable, sleep_time: float = 0.0
+) -> AsyncGenerator:
     """
     Convert any async iterable into an async generator.
     :param items: An async iterable to convert.

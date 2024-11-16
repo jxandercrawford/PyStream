@@ -1,4 +1,5 @@
 import unittest
+
 from stream import Chunk
 
 TEST_VALUES = range(100)
@@ -37,5 +38,5 @@ class TestChunk(unittest.TestCase):
             self.assertEqual(t1, TEST_FUNCTION(TEST_FUNCTION(t2)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

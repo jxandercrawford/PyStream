@@ -1,9 +1,13 @@
 import asyncio
+from typing import AsyncIterable, AsyncIterator, Iterable, Union
+
 from modules.utilities.asyncTools import to_async_generator
-from typing import Iterable, AsyncIterator, AsyncIterable, Union
 
 
 class Confluence(AsyncIterator):
+    """
+    A queue that can combine many Streams and Riverbeds.
+    """
 
     def __init__(self):
         self.__queue = asyncio.Queue()
@@ -13,7 +17,9 @@ class Confluence(AsyncIterator):
 
     async def __anext__(self):
         if not self.__gen_ready.is_set():
-            raise RuntimeWarning("The Confluence must be started via `start()` in order to be properly consumed.")
+            raise RuntimeWarning(
+                "The Confluence must be started via `start()` in order to be properly consumed."
+            )
 
         try:
             return await self.__gen.__anext__()
